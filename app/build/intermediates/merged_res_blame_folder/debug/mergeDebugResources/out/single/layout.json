@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "com.example.android.notepad.app-mergeDebugResources-42:/layout/noteslist_item.xml",
+        "source": "com.example.android.notepad.app-main-45:/layout/noteslist_item.xml"
+    },
+    {
+        "merged": "D:\\tools\\gradle-repository\\daemon\\8.7\\com.example.android.notepad.app-mergeDebugResources-42:\\layout\\note_editor.xml",
+        "source": "D:\\tools\\gradle-repository\\daemon\\8.7\\com.example.android.notepad.app-main-45:\\layout\\note_editor.xml"
+    },
+    {
+        "merged": "D:\\tools\\gradle-repository\\daemon\\8.7\\com.example.android.notepad.app-mergeDebugResources-42:\\layout\\noteslist_item.xml",
+        "source": "D:\\tools\\gradle-repository\\daemon\\8.7\\com.example.android.notepad.app-main-45:\\layout\\noteslist_item.xml"
+    },
+    {
+        "merged": "D:\\tools\\gradle-repository\\daemon\\8.7\\com.example.android.notepad.app-mergeDebugResources-42:\\layout\\activity_list_with_toolbar.xml",
+        "source": "D:\\tools\\gradle-repository\\daemon\\8.7\\com.example.android.notepad.app-main-45:\\layout\\activity_list_with_toolbar.xml"
+    },
+    {
+        "merged": "D:\\tools\\gradle-repository\\daemon\\8.7\\com.example.android.notepad.app-mergeDebugResources-42:\\layout\\title_editor.xml",
+        "source": "D:\\tools\\gradle-repository\\daemon\\8.7\\com.example.android.notepad.app-main-45:\\layout\\title_editor.xml"
+    }
+]

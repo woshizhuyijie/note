@@ -17,16 +17,19 @@
 package com.example.android.notepad;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.net.Uri;
@@ -36,7 +39,24 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.TextView;
+
+import androidx.appcompat.widget.Toolbar;
+
+import com.example.android.notepad.Adapter.NotesAdapter;
+
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
 
 /**
  * This Activity handles "editing" a note, where editing is responding to
@@ -60,7 +80,9 @@ public class NoteEditor extends Activity {
         new String[] {
             NotePad.Notes._ID,
             NotePad.Notes.COLUMN_NAME_TITLE,
-            NotePad.Notes.COLUMN_NAME_NOTE
+            NotePad.Notes.COLUMN_NAME_NOTE,
+            NotePad.Notes.COLUMN_NAME_COLOR_TAG,
+            NotePad.Notes.COLUMN_NAME_COLOR_BACKGROUND
     };
 
     // A label for the saved state of the activity
@@ -81,7 +103,10 @@ public class NoteEditor extends Activity {
     /**
      * Defines a custom EditText View that draws lines between each line of text that is displayed.
      */
-    public static class LinedEditText extends EditText {
+    /*
+    * android 12 not advise use EditText so use AppCompatEditText
+    * */
+    public static class LinedEditText extends androidx.appcompat.widget.AppCompatEditText {
         private Rect mRect;
         private Paint mPaint;
 
@@ -138,7 +163,6 @@ public class NoteEditor extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         /*
          * Creates an Intent to use when the Activity object's result is sent back to the
          * caller.
@@ -205,6 +229,7 @@ public class NoteEditor extends Activity {
          * the block will be momentary, but in a real app you should use
          * android.content.AsyncQueryHandler or android.os.AsyncTask.
          */
+
         mCursor = managedQuery(
             mUri,         // The URI that gets multiple notes from the provider.
             PROJECTION,   // A projection that returns the note ID and note content for each note.
@@ -247,6 +272,7 @@ public class NoteEditor extends Activity {
      */
     @Override
     protected void onResume() {
+        Context context=this;
         super.onResume();
 
         /*
@@ -263,6 +289,13 @@ public class NoteEditor extends Activity {
              * record.
              */
             mCursor.moveToFirst();
+            // 获取颜色标签并更新 UI
+            int colColorBackGroundIndex = mCursor.getColumnIndex(NotePad.Notes.COLUMN_NAME_COLOR_BACKGROUND);
+            String colorBackGround = mCursor.getString(colColorBackGroundIndex);
+            if (colorBackGround != null) {
+                // 将背景色设置为数据库中保存的颜色标签
+                mText.setBackgroundColor(Color.parseColor(colorBackGround));
+            }
 
             // Modifies the window title for the Activity according to the current Activity state.
             if (mState == STATE_EDIT) {
@@ -342,7 +375,9 @@ public class NoteEditor extends Activity {
          * exception or error.
          *
          */
-        if (mCursor != null) {
+        // 关闭 Cursor 以释放资源
+
+        if (mCursor != null&& !mCursor.isClosed()) {
 
             // Get the current note text.
             String text = mText.getText().toString();
@@ -371,6 +406,7 @@ public class NoteEditor extends Activity {
                 updateNote(text, text);
                 mState = STATE_EDIT;
           }
+            mCursor.close();
         }
     }
 
@@ -432,7 +468,7 @@ public class NoteEditor extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle all of the possible menu actions.
-        switch (item.getItemId()) {
+        /*switch (item.getItemId()) {
         case R.id.menu_save:
             String text = mText.getText().toString();
             updateNote(text, null);
@@ -445,7 +481,24 @@ public class NoteEditor extends Activity {
         case R.id.menu_revert:
             cancelNote();
             break;
+        }*/
+        int itemId = item.getItemId();
+
+        if (itemId == R.id.menu_save) {
+            String text = mText.getText().toString();
+            updateNote(text, null);
+           /* updateTime();*/
+            finish();
+        } else if (itemId == R.id.menu_delete) {
+            deleteNote();
+            finish();
+        } else if (itemId == R.id.menu_revert) {
+            cancelNote();
+        } else if (itemId==R.id.menu_background) {
+            showColorPickerDialog();
         }
+
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -570,13 +623,27 @@ public class NoteEditor extends Activity {
          * local database, the block will be momentary, but in a real app you should use
          * android.content.AsyncQueryHandler or android.os.AsyncTask.
          */
-        getContentResolver().update(
+        // Before proceeding with any update operation, ensure that the mCursor is not closed.
+        /*if (mCursor != null && !mCursor.isClosed()) {
+            // Close the old cursor if it is open
+            mCursor.close();
+        }*/
+       int rowsUpdated=getContentResolver().update(
                 mUri,    // The URI for the record to update.
                 values,  // The map of column names and new values to apply to them.
                 null,    // No selection criteria are used, so no where columns are necessary.
                 null     // No where columns are used, so no where arguments are necessary.
             );
-
+       /* // After the update, refresh the cursor (if needed).
+        if (rowsUpdated > 0) {
+            // Optionally, if you want to refresh the cursor with the latest data
+            mCursor = getContentResolver().query(
+                    mUri,   // Query the same URI to get the latest data
+                    null,   // Query all columns
+                    null,   // No selection criteria
+                    null,   // No selection arguments
+                    null    // No sorting
+            );}*/
 
     }
 
@@ -613,4 +680,132 @@ public class NoteEditor extends Activity {
             mText.setText("");
         }
     }
+    /*private void showColorPickerDialog() {
+        // 使用 Material Dialog 或其他颜色选择器库
+        final String[] colors = {"#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF"};
+        final String[] colorNames = {"Red", "Green", "Blue", "Yellow", "Magenta", "Cyan"};
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("背景颜色")
+                .setItems(colorNames, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        String selectedColor = colors[which];
+                        updateNoteColorBackground(selectedColor);
+                    }
+                });
+        builder.show();
+    }*/
+   /* private void showColorPickerDialog() {
+        // 颜色数组，可以加入更多的颜色
+        final String[] colors = {
+                "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#00FFFF",
+                "#FFA500", "#800080", "#FFC0CB", "#A52A2A", "#008000", "#808080"
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("选择背景颜色");
+
+        // 创建一个GridView来显示颜色块
+        GridView gridView = new GridView(this);
+        gridView.setNumColumns(4); // 设置每行显示的颜色块数量
+        gridView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, colors));
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parentView, View view, int position, long id) {
+                String selectedColor = colors[position];
+                updateNoteColorBackground(selectedColor); // 更新颜色
+            }
+        });
+
+        builder.setView(gridView);
+        builder.show();
+    }*/
+    private void showColorPickerDialog() {
+        // 颜色数组，可以加入更多的颜色
+        final String[] colors = {
+                "#F0F8FF",   // Alice Blue - 柔和的蓝色，适合长时间阅读
+                "#E0FFFF",   // Light Cyan - 淡青色，非常清新
+                "#FFF5EE",   // Seashell - 淡贝壳色，温暖柔和
+                "#F5FFFA",   // Mint Cream - 薄荷奶油色，清新凉爽
+                "#FAF0E6",   // Linen - 亚麻色，带有温暖的感觉
+                "#F5F5DC",   // Beige - 米黄色，优雅自然
+                "#FFE4B5",   // Moccasin - 驼色，柔和温暖
+                "#F4F4F4",   // Soft Gray - 柔和灰色，简洁现代
+                "#FFFAF0",   // Floral White - 花卉白，带有轻微的温暖色调
+                "#FFF0F5",   // Lavender Blush - 薰衣草红，淡紫色带有微微粉色
+                "#F0FFF0",   // Honeydew - 蜂蜜露色，清新柔和
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("选择背景颜色");
+
+        // 创建一个GridView来显示颜色块
+        GridView gridView = new GridView(this);
+
+
+// 设置GridView的边距，确保GridView可以适应屏幕宽度
+        gridView.setPadding(0, 0, 0, 0); // 如果需要，可以根据需要设置额外的内边距
+
+        /*gridView.setLayoutParams(new GridView.LayoutParams(
+                GridView.LayoutParams.MATCH_PARENT,
+                GridView.LayoutParams.WRAP_CONTENT));  // 确保GridView有足够的高度和宽度*/
+
+// 设置GridView的适配器
+
+        gridView.setNumColumns(6); // 设置每行显示的颜色块数量
+        gridView.setHorizontalSpacing(0);  // 设置水平间距
+        gridView.setVerticalSpacing(0);    // 设置垂直间距
+        gridView.setStretchMode(GridView.STRETCH_SPACING); // 拉伸显示
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;// 获取屏幕宽度
+      // 设置GridView的宽度和每个项的最大宽度
+        GridView.LayoutParams params = new GridView.LayoutParams(screenWidth / 6, GridView.LayoutParams.WRAP_CONTENT);
+        gridView.setLayoutParams(params);
+        // 创建一个自定义的适配器来显示颜色块
+        gridView.setAdapter(new ColorAdapter(this, colors));
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parentView, View view, int position, long id) {
+                String selectedColor = colors[position];
+                updateNoteColorBackground(selectedColor); // 更新颜色
+            }
+        });
+
+        builder.setView(gridView);
+        // 调整对话框的尺寸（增加宽度和高度）
+        // 创建对话框
+        AlertDialog dialog = builder.create();
+
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            WindowManager.LayoutParams dialogParams = window.getAttributes();
+            dialogParams.width = (int) (screenWidth * 0.9);  // 设置对话框宽度为屏幕的 90%
+            window.setAttributes(dialogParams);
+        }
+        // 显示对话框
+        dialog.show();
+        //builder.show();
+    }
+
+
+    private void updateNoteColorBackground(String color) {
+        if (mUri != null) {
+
+            ContentValues values = new ContentValues();
+            values.put(NotePad.Notes.COLUMN_NAME_COLOR_BACKGROUND, color);
+
+            // 更新数据库中的颜色标签字段
+            int rowsUpdated = getContentResolver().update(mUri, values, null, null);
+            Log.d("NoteEditor", "Rows updated: " + rowsUpdated); // 检查是否更新成功
+
+            // 更新 UI 显示颜色
+            mText.setBackgroundColor(Color.parseColor(color));  // 更新背景色
+            //mCursor.close();
+        } else {
+            Log.e("NoteEditor", "mUri is null, unable to update background color.");
+        }
+    }
+
+
 }

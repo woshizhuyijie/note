@@ -63,7 +63,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
     /**
      * The database version
      */
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     /**
      * A projection map used to select columns from the database
@@ -155,6 +155,8 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
         sNotesProjectionMap.put(
                 NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE,
                 NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE);
+        sNotesProjectionMap.put(NotePad.Notes.COLUMN_NAME_COLOR_BACKGROUND,NotePad.Notes.COLUMN_NAME_COLOR_BACKGROUND);
+        sNotesProjectionMap.put(NotePad.Notes.COLUMN_NAME_COLOR_TAG,NotePad.Notes.COLUMN_NAME_COLOR_TAG);
 
         /*
          * Creates an initializes a projection map for handling Live Folders
@@ -177,6 +179,7 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
     * for testing purposes.
     */
    static class DatabaseHelper extends SQLiteOpenHelper {
+        private static final int DATABASE_VERSION = 3;
 
        DatabaseHelper(Context context) {
 
@@ -196,7 +199,8 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
                    + NotePad.Notes.COLUMN_NAME_TITLE + " TEXT,"
                    + NotePad.Notes.COLUMN_NAME_NOTE + " TEXT,"
                    + NotePad.Notes.COLUMN_NAME_CREATE_DATE + " INTEGER,"
-                   + NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE + " INTEGER"
+                   + NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE + " INTEGER,"+NotePad.Notes.COLUMN_NAME_COLOR_TAG+" TEXT,"
+                   +NotePad.Notes.COLUMN_NAME_COLOR_BACKGROUND+" Text"
                    + ");");
        }
 
@@ -213,12 +217,16 @@ public class NotePadProvider extends ContentProvider implements PipeDataWriter<C
            // Logs that the database is being upgraded
            Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                    + newVersion + ", which will destroy all old data");
+           if(oldVersion<3){
+               db.execSQL("ALTER TABLE notes ADD COLUMN color_backgroud TEXT");
+               db.execSQL("ALTER TABLE notes ADD COLUMN color_tag TEXT");
+           }
 
            // Kills the table and existing data
-           db.execSQL("DROP TABLE IF EXISTS notes");
+          /* db.execSQL("DROP TABLE IF EXISTS notes");
 
            // Recreates the database with a new version
-           onCreate(db);
+           onCreate(db);*/
        }
    }
 

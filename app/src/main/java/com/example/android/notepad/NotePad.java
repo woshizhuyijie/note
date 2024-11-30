@@ -150,5 +150,7 @@ public final class NotePad {
          * <P>Type: INTEGER (long from System.curentTimeMillis())</P>
          */
         public static final String COLUMN_NAME_MODIFICATION_DATE = "modified";
+        public static final String COLUMN_NAME_COLOR_TAG = "color_tag";  // 新增字段：用于存储颜色标签
+        public static final String COLUMN_NAME_COLOR_BACKGROUND = "color_background";
     }
 }

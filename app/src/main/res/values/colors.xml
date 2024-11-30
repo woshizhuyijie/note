@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="item_selectBackground">#33B5E5</color>
+
+        <!-- 默认颜色 -->
+        <color name="card_default">#FFFFFF</color> <!-- 白色，代表默认背景 -->
+
+        <!-- 点击时的颜色（浅灰色） -->
+        <color name="card_clicked">#D3D3D3</color> <!-- 浅灰色 -->
+
+        <!-- 长按时的颜色（深灰色） -->
+        <color name="card_long_pressed">#A9A9A9</color> <!-- 深灰色 -->
+      <color name="bc">#474747</color>
+</resources>

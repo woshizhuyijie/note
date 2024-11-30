@@ -1,0 +1,5 @@
+com.example.android.notepad.test.app-core-1.6.1-0 D:\tools\gradle-repository\caches\transforms-4\1998debb3d8abad0175163577fc46cc6\transformed\core-1.6.1\res
+com.example.android.notepad.test.app-androidTest-1 E:\project\NotePad\app\build\generated\res\resValues\androidTest\debug
+com.example.android.notepad.test.app-mergeDebugAndroidTestResources-2 E:\project\NotePad\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\merged.dir
+com.example.android.notepad.test.app-mergeDebugAndroidTestResources-3 E:\project\NotePad\app\build\intermediates\incremental\debugAndroidTest\mergeDebugAndroidTestResources\stripped.dir
+com.example.android.notepad.test.app-debugAndroidTest-4 E:\project\NotePad\app\build\intermediates\merged_res\debugAndroidTest\mergeDebugAndroidTestResources
