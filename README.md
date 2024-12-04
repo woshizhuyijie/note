@@ -104,6 +104,8 @@
 
 ### 使用cardView包裹listItem 实现圆角卡片效果和点击附带周围阴影效果
 
+（这里笔记内容和前面的不一样是因为更新了数据库字段，把之前的数据删除了）
+
 #### 实现效果
 
 ![](/picture/UIR.png)
@@ -390,11 +392,35 @@ adapter.changeCursor(cursor);  // 更新适配器中的Cursor
 
 ![](/picture/UIR.png)
 
+![](/picture/UIP3.png)
+
+点击changeTagColor 然后选择笔记标签颜色为第二个颜色
+
 ![](/picture/ColorR2.png)
+
+可以看到点击之后www这个笔记就变成红色了
+
+![](/picture/UIP4.png)
+
+回到主界面已经成功改变笔记颜色了
+
+![](/picture/UIP5.png)
 
 ![](/picture/ColorR.png)
 
+![](/picture/UIR3.png)
+
+点击选择背景颜色setBackGround然后在弹出的界面选择浅蓝色
+
+
+
 ![](/picture/ColorR1.png)
+
+![](/picture/UIR4.png)
+
+![](/picture/UIR5.png)
+
+可以看到背景颜色修改成功了
 
 ### 实现步骤
 
@@ -433,7 +459,25 @@ sNotesProjectionMap.put(NotePad.Notes.COLUMN_NAME_COLOR_BACKGROUND,NotePad.Notes
        }
 ```
 
+在数据库创建的时候多加两个字段，然后把原来的数据库删除到达更新字段的目的
+
+```java
+ @Override
+       public void onCreate(SQLiteDatabase db) {
+           db.execSQL("CREATE TABLE " + NotePad.Notes.TABLE_NAME + " ("
+                   + NotePad.Notes._ID + " INTEGER PRIMARY KEY,"
+                   + NotePad.Notes.COLUMN_NAME_TITLE + " TEXT,"
+                   + NotePad.Notes.COLUMN_NAME_NOTE + " TEXT,"
+                   + NotePad.Notes.COLUMN_NAME_CREATE_DATE + " INTEGER,"
+                   + NotePad.Notes.COLUMN_NAME_MODIFICATION_DATE + " INTEGER,"+NotePad.Notes.COLUMN_NAME_COLOR_TAG+" TEXT,"
+                   +NotePad.Notes.COLUMN_NAME_COLOR_BACKGROUND+" Text"
+                   + ");");
+       }
+```
+
 2更新菜单布局文件 增加changeTagColor 和setBackGround
+
+这个是上下文菜单
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -448,6 +492,8 @@ sNotesProjectionMap.put(NotePad.Notes.COLUMN_NAME_COLOR_BACKGROUND,NotePad.Notes
         android:title="changeTagColor" />
 </menu>
 ```
+
+这个是optionMenu
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
